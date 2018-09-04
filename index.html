@@ -74,8 +74,8 @@
     <div class="matrix">
         <div class="bracket"> [</div>
         <div class="matrixCol">
-            <div class="box b" id="x_in"><i>x</i></div>
-            <div class="box c" id="y_in"><i>y</i></div>
+            <div class="box b" id="x_in"><i>2</i></div>
+            <div class="box c" id="y_in"><i>2</i></div>
         </div>
         <div class="bracket"> ]</div>
     </div>
@@ -110,8 +110,23 @@
         <div class="box" id="y_out"><i>y</i></div>
     </div>
     <div class="bracket"> ]</div>
-
 </div>
+<div class="matrix">
+    <div class="bracket"> [</div>
+    <div class="matrixCol">
+        <div class="box" id="x2_in"><i>3</i></div>
+        <div class="box" id="y2_in"><i>-3</i></div>
+    </div>
+    <div class="bracket"> ]</div>
+    <hr>
+    <div class="bracket"> [</div>
+    <div class="matrixCol">
+        <div class="box" id="x2_out"><i>x2</i></div>
+        <div class="box" id="y2_out"><i>y2</i></div>
+    </div>
+    <div class="bracket"> ]</div>
+</div>
+
 
 
 <div id="target" class="plot"></div>
@@ -125,10 +140,13 @@
 
     const xIn = parseFloat(document.getElementById('x_in').innerText);
     const yIn = parseFloat(document.getElementById('y_in').innerText);
+    const xOut = document.getElementById('x_out');
+    const yOut = document.getElementById('y_out');
+    const x2_Out = document.getElementById('x2_out');
+    const y2_Out = document.getElementById('y2_out');
 
     const startVectorA = [xIn,yIn];
-
-    const startVectorB = [2,-4];
+    const startVectorB = [3,-3];
     let matrixA = [
         [1, 0],
         [0, 1]
@@ -154,14 +172,21 @@
     };
     console.log(transform([3, 4], matrixA))
 
+
+    calcData = (A, B, matrix) => [
+        ...pointToLine( transform(A, matrix), 'v1'),
+        ...pointToLine( transform(B, matrix), 'v2'),
+        ...anchorPoints]
+
+    console.log(calcData(startVectorB, startVectorA, matrixA))
     const myChart = new Taucharts.Chart({
-        data: pointToLine(startVectorA).concat(anchorPoints),
+        data: calcData(startVectorA, startVectorB, matrixA),
         type: 'line',
         x: 'i',
         y: 'val',
         color: 'type',
         plugins: [
-            Taucharts.api.plugins.get('legend')(),
+            // Taucharts.api.plugins.get('legend')(),
             Taucharts.api.plugins.get('tooltip')()
         ],
         settings: {
@@ -203,15 +228,24 @@
             document.getElementById(id + '_label').innerHTML = ev.target.value;
 
             matrixA = updateMatrix(id, ev.target.value)
+            const data = calcData(startVectorA, startVectorB, matrixA)
+
+            const v1 = data.filter(d => d.type === 'v1')[1]
+            xOut.innerText = v1.i.toFixed(2);
+            yOut.innerText = v1.val.toFixed(2);
+
+            const v2 = data.filter(d => d.type === 'v2')[1]
+            x2_Out.innerText = v2.i.toFixed(2);;
+            y2_Out.innerText = v2.val.toFixed(2);;
 
             window.myChart.updateConfig({
-                data: pointToLine(transform(startVectorA, matrixA)).concat(anchorPoints),
+                data:data,
                 type: 'line',
                 x: 'i',
                 y: 'val',
                 color: 'type',
                 plugins: [
-                    Taucharts.api.plugins.get('legend')(),
+                    // Taucharts.api.plugins.get('legend')(),
                     Taucharts.api.plugins.get('tooltip')()
                 ],
                 settings: {
