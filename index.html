@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@4.13.0/build/d3.min.js" charset="utf-8"></script>
+<script src="https://cdn.jsdelivr.net/npm/taucharts@2/dist/taucharts.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/taucharts@2/dist/taucharts.min.css">
+
+<style>
+
+    html,
+    body,
+    .plot {
+        width: 60vw;
+        height: 60vw;
+        margin: 0;
+        padding: 0;
+    }
+
+    #target {
+
+    }
+
+    .gridder {
+        display: grid;
+        grid-template-columns: 100px 100px;
+        grid-gap: 10px;
+        background-color: #fff;
+        color: #444;
+    }
+
+    .box {
+        background-color: #444;
+        color: #fff;
+        border-radius: 5px;
+        text-align: center;
+        padding: 10px;
+        font-size: 150%;
+    }
+
+    #scatter > svg {
+        display: block;
+    }
+
+    input {
+        margin-left: -0.5rem;
+        width: 6rem;
+    }
+
+    .bracket {
+        font-size: 8em;
+    }
+
+    .matrix {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .matrixCol {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+<div class="matrix">
+
+    <div class="matrix">
+        <div class="bracket"> [</div>
+        <div class="matrixCol">
+            <div class="box b" id="x_in"><i>x</i></div>
+            <div class="box c" id="y_in"><i>y</i></div>
+        </div>
+        <div class="bracket"> ]</div>
+    </div>
+    <div class='bracket'>x</div>
+    <div class="matrix">
+        <div class="bracket"> [</div>
+        <div class="gridder">
+            <section class="box">
+                <input id="a" type="range" value="1">
+                <div id="a_label">1</div>
+            </section>
+            <section class="box">
+                <input id="b" type="range" value="0">
+                <div id="b_label">0</div>
+            </section>
+            <section class="box">
+                <input id="c" type="range" value="0">
+                <div id="c_label">0</div>
+            </section>
+            <section class="box">
+                <input id="d" type="range" value="1">
+                <div id="d_label">1</div>
+            </section>
+        </div>
+        <div class="bracket"> ]</div>
+    </div>
+    <div class="bracket"> = </div>
+
+    <div class="bracket"> [</div>
+    <div class="matrixCol">
+        <div class="box" id="x_out"><i>x</i></div>
+        <div class="box" id="y_out"><i>y</i></div>
+    </div>
+    <div class="bracket"> ]</div>
+
+</div>
+
+
+<div id="target" class="plot"></div>
+<div id="scatter" class="plot"></div>
+<div id="swag" class="plot"></div>
+<body>
+
+<script>
+
+
+
+    const xIn = parseFloat(document.getElementById('x_in').innerText);
+    const yIn = parseFloat(document.getElementById('y_in').innerText);
+
+    const startVectorA = [xIn,yIn];
+
+    const startVectorB = [2,-4];
+    let matrixA = [
+        [1, 0],
+        [0, 1]
+    ];
+    //hack to fixate the plot
+    const anchorPoints = [
+        {i: 10, val: 10, type:'anchor1'},
+        {i: -10, val: -10, type:'anchor2'}
+        ]
+
+    pointToLine = (point, type = 'vec') =>
+        [{i: 0, val: 0, type}, {i: point[0], val: point[1], type}]; // {type: 'sin', formula: 'sin(i)', i: i, val: Math.sin(i)},
+
+    transform = (point, matrix) => {
+        //ax + cx
+        const p = [];
+        p[0] = point[0] * matrix[0][0] + point[0] * matrix[0][1]
+        //by + dy
+        p[1] = point[1] * matrix[1][0] + point[1] * matrix[1][1];
+
+        console.log(point + "  =>  " + p);
+        return p;
+    };
+    console.log(transform([3, 4], matrixA))
+
+    const myChart = new Taucharts.Chart({
+        data: pointToLine(startVectorA).concat(anchorPoints),
+        type: 'line',
+        x: 'i',
+        y: 'val',
+        color: 'type',
+        plugins: [
+            Taucharts.api.plugins.get('legend')(),
+            Taucharts.api.plugins.get('tooltip')()
+        ],
+        settings: {
+            fitModel: 'normal'
+        }
+    })
+
+    myChart.renderTo('#target');
+
+    console.log(myChart)
+    window.myChart = myChart;
+
+    updateMatrix = (id, value) => {
+        const m = matrixA.slice();
+        switch(id) {
+            case "a":
+                m[0][0] = value
+                break;
+            case "b":
+                m[1][0] = value
+                break;
+            case "c":
+                m[0][1] = value
+                break;
+            case "d":
+                m[1][1] = value
+                break;
+        }
+        return m;
+    }
+
+
+    const inputs = ['a', 'b', 'c', 'd'].map(id => {
+        node = document.getElementById(id);
+        node.setAttribute("step", "0.1");
+        node.setAttribute("min", "-4");
+        node.setAttribute("max", "4");
+        node.addEventListener('input', (ev) => {
+            document.getElementById(id + '_label').innerHTML = ev.target.value;
+
+            matrixA = updateMatrix(id, ev.target.value)
+
+            window.myChart.updateConfig({
+                data: pointToLine(transform(startVectorA, matrixA)).concat(anchorPoints),
+                type: 'line',
+                x: 'i',
+                y: 'val',
+                color: 'type',
+                plugins: [
+                    Taucharts.api.plugins.get('legend')(),
+                    Taucharts.api.plugins.get('tooltip')()
+                ],
+                settings: {
+                    animationSpeed: 0,
+                }
+            })
+        });
+        return node
+    })
+
+
+</script>
+
+</body>
+</html>
