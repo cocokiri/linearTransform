@@ -17,8 +17,8 @@
     html,
     body,
     .plot {
-        width: 60vw;
-        height: 60vw;
+        width: 40vw;
+        height: 40vw;
         margin: 0;
         padding: 0;
     }
@@ -105,7 +105,6 @@
         <div class="box" id="y_out"><i>y</i></div>
     </div>
     <div class="bracket"> ]</div>
-    <hr>
     <hr>
     <div id="dotProduct">DotProduct</div>
 </div>
@@ -237,20 +236,35 @@
             const v1 = data.filter(d => d.type === 'v1')[1]
             const A = [];
             const B = [];
-            A[0] = v1.i.toFixed(2);
-            A[1] = v1.val.toFixed(2);
+            A[0] = parseFloat(v1.i.toFixed(2));
+            A[1] = parseFloat(v1.val.toFixed(2));
             xOut.innerText = A[0];
             yOut.innerText = A[1];
 
             const v2 = data.filter(d => d.type === 'v2')[1]
 
-            B[0]= v2.i.toFixed(2);
-            B[1] = v2.val.toFixed(2);
+            B[0]= parseFloat(v2.i.toFixed(2));
+            B[1] = parseFloat(v2.val.toFixed(2));
             x2_Out.innerText = B[0];
             y2_Out.innerText = B[1];
 
             dotProduct_node.innerText = dotProduct(A, B)
+            // console.log(A, B)
+            A.concat(B).forEach(v => {
 
+                v[0] === 0 ? v[0] = 0.00000001 :null
+                v[1] === 0 ? v[1] = 0.00000001 :null
+            })
+            // data.map(d => {
+            //     if (d.i === 0) {
+            //         // d.i = 0.0000001
+            //     }
+            //     if (d.val === 0) {
+            //         d.val = 0.000001
+            //     }
+            // })
+
+            console.log(data)
             window.myChart.updateConfig({
                 data:data,
                 type: 'line',
