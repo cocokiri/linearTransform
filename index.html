@@ -22,11 +22,6 @@
         margin: 0;
         padding: 0;
     }
-
-    #target {
-
-    }
-
     .gridder {
         display: grid;
         grid-template-columns: 100px 100px;
@@ -110,6 +105,9 @@
         <div class="box" id="y_out"><i>y</i></div>
     </div>
     <div class="bracket"> ]</div>
+    <hr>
+    <hr>
+    <div id="dotProduct">DotProduct</div>
 </div>
 <div class="matrix">
     <div class="bracket"> [</div>
@@ -130,20 +128,20 @@
 
 
 <div id="target" class="plot"></div>
-<div id="scatter" class="plot"></div>
-<div id="swag" class="plot"></div>
 <body>
 
 <script>
 
 
-
+    //todo make nodes {} object to keep refs
     const xIn = parseFloat(document.getElementById('x_in').innerText);
     const yIn = parseFloat(document.getElementById('y_in').innerText);
     const xOut = document.getElementById('x_out');
     const yOut = document.getElementById('y_out');
     const x2_Out = document.getElementById('x2_out');
     const y2_Out = document.getElementById('y2_out');
+
+    const dotProduct_node = document.getElementById('dotProduct');
 
     const startVectorA = [xIn,yIn];
     const startVectorB = [3,-3];
@@ -219,6 +217,12 @@
     }
 
 
+    const dotProduct = (A, B) => {
+        let sum = 0;
+        A.forEach(a => B.forEach(b => sum += b*a ))
+        return sum;
+    }
+
     const inputs = ['a', 'b', 'c', 'd'].map(id => {
         node = document.getElementById(id);
         node.setAttribute("step", "0.1");
@@ -231,12 +235,21 @@
             const data = calcData(startVectorA, startVectorB, matrixA)
 
             const v1 = data.filter(d => d.type === 'v1')[1]
-            xOut.innerText = v1.i.toFixed(2);
-            yOut.innerText = v1.val.toFixed(2);
+            const A = [];
+            const B = [];
+            A[0] = v1.i.toFixed(2);
+            A[1] = v1.val.toFixed(2);
+            xOut.innerText = A[0];
+            yOut.innerText = A[1];
 
             const v2 = data.filter(d => d.type === 'v2')[1]
-            x2_Out.innerText = v2.i.toFixed(2);;
-            y2_Out.innerText = v2.val.toFixed(2);;
+
+            B[0]= v2.i.toFixed(2);
+            B[1] = v2.val.toFixed(2);
+            x2_Out.innerText = B[0];
+            y2_Out.innerText = B[1];
+
+            dotProduct_node.innerText = dotProduct(A, B)
 
             window.myChart.updateConfig({
                 data:data,
