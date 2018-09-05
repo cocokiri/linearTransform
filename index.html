@@ -79,8 +79,8 @@
     <div class="matrix">
         <div class="bracket"> [</div>
         <div class="matrixCol">
-            <div class="box b" id="x_in"><i>2</i></div>
-            <div class="box c" id="y_in"><i>2</i></div>
+            <div class="box b" id="x_in"><i>1</i></div>
+            <div class="box c" id="y_in"><i>0</i></div>
         </div>
         <div class="bracket"> ]</div>
     </div>
@@ -121,8 +121,8 @@
 <div class="matrix">
     <div class="bracket"> [</div>
     <div class="matrixCol">
-        <div class="box" id="x2_in"><i>3</i></div>
-        <div class="box" id="y2_in"><i>-3</i></div>
+        <div class="box" id="x2_in"><i>0</i></div>
+        <div class="box" id="y2_in"><i>1</i></div>
     </div>
     <div class="bracket"> ]</div>
     <hr>
@@ -154,16 +154,16 @@
     const dotProduct_node = document.getElementById('dotProduct');
     const determinant_node = document.getElementById('determinant');
 
-    const startVectorA = [xIn,yIn];
-    const startVectorB = [3,1];
+    const startVectorA = [1,0];
+    const startVectorB = [0,1];
     let matrixA = [
         [1, 0],
         [0, 1]
     ];
     //hack to fixate the plot
     const anchorPoints = [
-        {i: 10, val: 10, type:'anchor1'},
-        {i: -10, val: -10, type:'anchor2'}
+        {i: 2, val: 2, type:'anchor1'},
+        {i: -2, val: -2, type:'anchor2'}
         ]
 
     pointToLine = (point, type = 'vec') =>
@@ -229,8 +229,10 @@
 
     const dotProduct = (A, B) => {
         let sum = 0;
-        A.forEach(a => B.forEach(b => sum += b*a ))
-        return sum;
+        return A[0]*B[0] + A[1]*B[1]
+        // A.forEach(a => B.forEach(b => sum += b*a ))
+        // console.log('dot', sum)
+        // return sum;
     }
 
     const inputs = ['a', 'b', 'c', 'd'].map(id => {
@@ -245,6 +247,9 @@
             const data = calcData(startVectorA, startVectorB, matrixA)
 
             const v1 = data.filter(d => d.type === 'v1')[1]
+            console.log(data, 'data')
+            console.log(v1, 'v1')
+
             const A = [];
             const B = [];
             A[0] = parseFloat(v1.i.toFixed(2));
@@ -253,6 +258,7 @@
             yOut.innerText = A[1];
 
             const v2 = data.filter(d => d.type === 'v2')[1]
+            console.log(v2, 'v2')
 
             B[0]= parseFloat(v2.i.toFixed(2));
             B[1] = parseFloat(v2.val.toFixed(2));
@@ -262,11 +268,11 @@
             dotProduct_node.innerText = dotProduct(A, B).toFixed(2)
             determinant_node.innerText = determinant(matrixA).toFixed(2)
             // console.log(A, B)
-            A.concat(B).forEach(v => {
-
-                v[0] === 0 ? v[0] = 0.00000001 :null
-                v[1] === 0 ? v[1] = 0.00000001 :null
-            })
+            // A.concat(B).forEach(v => {
+            //
+            //     v[0] === 0 ? v[0] = 0.00000001 :null
+            //     v[1] === 0 ? v[1] = 0.00000001 :null
+            // })
             // data.map(d => {
             //     if (d.i < 0.2 && d.i === Math.abs(d.i)) {
             //         d.i = -0.3
@@ -279,7 +285,6 @@
             //     }
             // })
 
-            console.log(data)
             window.myChart.updateConfig({
                 data:data,
                 type: 'line',
