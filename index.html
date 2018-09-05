@@ -57,6 +57,16 @@
         flex-direction: row;
     }
 
+    #determinant {
+        font-size: 36px;
+        color: orange;
+    }
+
+    #dotProduct {
+        color: blueviolet;
+        font-size: 36px;
+    }
+
     .matrixCol {
         margin-top: 2rem;
         display: flex;
@@ -122,6 +132,7 @@
         <div class="box" id="y2_out"><i>y2</i></div>
     </div>
     <div class="bracket"> ]</div>
+    <div id="determinant">Determinant</div>
 </div>
 
 
@@ -141,9 +152,10 @@
     const y2_Out = document.getElementById('y2_out');
 
     const dotProduct_node = document.getElementById('dotProduct');
+    const determinant_node = document.getElementById('determinant');
 
     const startVectorA = [xIn,yIn];
-    const startVectorB = [3,-3];
+    const startVectorB = [3,1];
     let matrixA = [
         [1, 0],
         [0, 1]
@@ -158,11 +170,9 @@
         [{i: 0, val: 0, type}, {i: point[0], val: point[1], type}]; // {type: 'sin', formula: 'sin(i)', i: i, val: Math.sin(i)},
 
     transform = (point, matrix) => {
-        //ax + cx
         const p = [];
-        p[0] = point[0] * matrix[0][0] + point[0] * matrix[0][1]
-        //by + dy
-        p[1] = point[1] * matrix[1][0] + point[1] * matrix[1][1];
+        p[0] = point[0] * matrix[0][0] + point[1] * matrix[0][1]
+        p[1] = point[0] * matrix[1][0] + point[1] * matrix[1][1];
 
         console.log(point + "  =>  " + p);
         return p;
@@ -203,10 +213,10 @@
                 m[0][0] = value
                 break;
             case "b":
-                m[1][0] = value
+                m[0][1] = value
                 break;
             case "c":
-                m[0][1] = value
+                m[1][0] = value
                 break;
             case "d":
                 m[1][1] = value
@@ -215,6 +225,7 @@
         return m;
     }
 
+    const determinant = (matrix) => matrix[0][0]*matrix[1][1] - matrix[0][1] * matrix[1][0]
 
     const dotProduct = (A, B) => {
         let sum = 0;
@@ -248,7 +259,8 @@
             x2_Out.innerText = B[0];
             y2_Out.innerText = B[1];
 
-            dotProduct_node.innerText = dotProduct(A, B)
+            dotProduct_node.innerText = dotProduct(A, B).toFixed(2)
+            determinant_node.innerText = determinant(matrixA).toFixed(2)
             // console.log(A, B)
             A.concat(B).forEach(v => {
 
@@ -256,8 +268,11 @@
                 v[1] === 0 ? v[1] = 0.00000001 :null
             })
             // data.map(d => {
-            //     if (d.i === 0) {
-            //         // d.i = 0.0000001
+            //     if (d.i < 0.2 && d.i === Math.abs(d.i)) {
+            //         d.i = -0.3
+            //     }
+            //     else if(d.i > -0.2 && d.i !== Math.abs(d.i)) {
+            //         d.i = 0.3
             //     }
             //     if (d.val === 0) {
             //         d.val = 0.000001
